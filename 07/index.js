@@ -11,16 +11,14 @@ function parseLine(line) {
 	return {color, children};
 }
 
-function findContaining(values, color) {
-	let list = [color];
+function findContaining(values, ...list) {
 	while(true) {
 		let added = false;
 		for (const element of list) {
-			for(const el of values) {
-				if(list.indexOf(el.color) == -1 && canContain(el, element)) {
-					list.push(el.color);
-					added = true;
-				}
+			const missing = values.filter(v => list.indexOf(v.color) == -1 && canContain(v, element)).map(v => v.color);
+			if(missing.length > 0) {
+				list = [...list, ...missing];
+				added = true;
 			}
 		}
 		if(!added) {
