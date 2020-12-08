@@ -1,9 +1,12 @@
 const fs = require("fs");
 
 const data = fs.readFileSync("input.txt");
-const values = data.toString().split("\n").map(parseLine);
+const values = data.toString().split("\n").map(parseLine).filter(v => v !== null);
 
 function parseLine(line) {
+	if(line === null || line.length === 0) {
+		return null;
+	}
 	let [ , instruction, argument] = line.match(/(\w+) ([\+\-]\d+)/);
 	argument = parseInt(argument);
 	return {instruction, argument};
