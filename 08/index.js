@@ -27,9 +27,6 @@ class fsm {
 				this.ip += command.argument;
 				break;
 			case "nop":
-				if((this.ip + command.argument) >= 600) {
-					console.log(this.ip);
-				}
 				this.ip++;
 				break;
 			default:
