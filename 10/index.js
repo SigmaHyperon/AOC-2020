@@ -12,21 +12,11 @@ const grouped = differences.reduce((acc, v) => (acc[v] = (acc[v] || 0) + 1, acc)
 console.log(`part1: ${grouped[1] * (grouped[3] + 1)}`);
 
 function tribonacci(n) {
-	if(n < 2) {
-		return 0;
-	} else if(n < 3) {
-		return 1;
-	} else {
-		return tribonacci(n-3) + tribonacci(n-2) + tribonacci(n-1);
+	const list = [0, 0, 1];
+	while(n > list.length - 1) {
+		list.push(list.slice(list.length - 3).reduce((acc, v) => acc + v, 0));
 	}
-}
-
-function getPossibilities(stepsize) {
-	if(stepsize == 0) {
-		return 0;
-	} else {
-		return tribonacci(stepsize + 2)
-	}
+	return list[n];
 }
 
 //get indices of all 3s
@@ -41,4 +31,4 @@ if(differences.length - indices[indices.length - 1] > 1) {
 }
 
 //map to possibilities and multiply
-console.log("part2: "+distances.filter(v => v > 0).map(getPossibilities).reduce((acc, v) => acc * v, 1));
+console.log("part2: "+distances.filter(v => v > 0).map(v => tribonacci(v + 2)).reduce((acc, v) => acc * v, 1));
