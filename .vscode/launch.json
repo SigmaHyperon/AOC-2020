@@ -93,6 +93,16 @@
 			],
 			"program": "${workspaceFolder}\\09\\index.js",
 			"cwd": "${workspaceFolder}\\09"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "10",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}\\10\\index.js",
+			"cwd": "${workspaceFolder}\\10"
 		}
 	]
 }
