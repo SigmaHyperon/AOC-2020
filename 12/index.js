@@ -1,17 +1,6 @@
 const fs = require("fs");
 
 const data = fs.readFileSync("input.txt");
-// const data = `N3
-// R90
-// R90
-// R90
-// R90
-// R180
-// R180
-// R270
-// R270
-// R270
-// R270`;
 const values = data.toString().split("\n").filter(v => v.length > 0).map(parseLine);
 
 function parseLine(line) {
