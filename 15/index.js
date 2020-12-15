@@ -5,23 +5,11 @@ function getN(n, input) {
 	const before = new Map();
 	let mostRecent = null;
 	for(let i = 0; i < n; i++) {
-		if(i < input.length) {
-			//starting sequence
-			mostRecent = input[i];
-			mentioned.set(input[i], i);
-		} else {
-			if(!before.has(mostRecent)) {
-				mostRecent = 0;
-				before.set(mostRecent, mentioned.get(mostRecent));
-				mentioned.set(mostRecent, i);
-			} else {
-				mostRecent = mentioned.get(mostRecent) - before.get(mostRecent);
-				if(mentioned.has(mostRecent)) {
-					before.set(mostRecent, mentioned.get(mostRecent));
-				}
-				mentioned.set(mostRecent, i);
-			}
+		mostRecent = i < input.length ? input[i] : before.has(mostRecent) ? mentioned.get(mostRecent) - before.get(mostRecent) : 0;
+		if(mentioned.has(mostRecent)) {
+			before.set(mostRecent, mentioned.get(mostRecent));
 		}
+		mentioned.set(mostRecent, i);
 	}
 	return mostRecent;
 }
