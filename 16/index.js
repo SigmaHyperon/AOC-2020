@@ -13,11 +13,11 @@ function parseRule(line) {
 }
 
 function parseTicket(line) {
-	return {values: line.split(",").map(v => parseInt(v))};
+	return line.split(",").map(v => parseInt(v));
 }
 
 function getErrorRate(ticket, rules) {
-	return ticket.values.filter(v => getMatchingRules(v, rules).length === 0).reduce((acc, v) => acc + v, 0);
+	return ticket.filter(v => getMatchingRules(v, rules).length === 0).reduce((acc, v) => acc + v, 0);
 }
 
 function getMatchingRules(value, rules) {
@@ -28,16 +28,10 @@ console.time("time");
 console.log("part1:", otherTickets.map(v => getErrorRate(v, rules)).reduce((acc, v) => acc + v, 0));
 console.timeEnd("time");
 
-function getValidTickets(tickets, rules) {
-	return tickets.filter(v => getErrorRate(v, rules) === 0);
-}
-
 function getFieldSequence(tickets, rules) {
 	let fields = new Map();
-	const vTickets = getValidTickets(tickets, rules);
-
-	for(let ticket of vTickets) {
-		for(const [index, value] of ticket.values.entries()) {
+	for(let ticket of tickets.filter(v => getErrorRate(v, rules) === 0)) {
+		for(const [index, value] of ticket.entries()) {
 			const mRules = getMatchingRules(value, rules);
 			if(!fields.has(index)) {
 				fields.set(index, mRules);
@@ -57,5 +51,5 @@ function getFieldSequence(tickets, rules) {
 }
 
 console.time("time");
-console.log("part2:",Array.from(getFieldSequence(otherTickets, rules).entries()).filter(v => v[0].startsWith("departure")).map(v => myTicket.values[v[1]]).reduce((acc, v) => acc * v, 1));
+console.log("part2:",Array.from(getFieldSequence(otherTickets, rules).entries()).filter(v => v[0].startsWith("departure")).map(v => myTicket[v[1]]).reduce((acc, v) => acc * v, 1));
 console.timeEnd("time");
