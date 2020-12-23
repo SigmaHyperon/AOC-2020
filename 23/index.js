@@ -1,26 +1,51 @@
 const fs = require("fs");
 
 const data = fs.readFileSync("input.txt");
-// const data = "389125467";
 const values = data.toString().split("").filter(v => v.length > 0).map(v => parseInt(v));
 
 class LinkedList {
     constructor() {
         this.head = null;
+        this.min = null;
+        this.max = null;
+        this.last = null;
+        this.lookup = new Map();
     }
 
-    add(element) {
-        if(this.head === null) {
-            this.head = {element, next: null};
-        } else {
-            const last = this.getLast();
-            last.next = {element, next: null};
+    add(...elements) {
+        this.addArray(elements);
+    }
+
+    addArray(array) {
+        for(let element of array) {
+            if(this.head === null) {
+                this.head = {element, next: null};
+                this.last = this.head;
+                this.lookup.set(element, this.head);
+                this.min = element;
+                this.max = element;
+            } else {
+                this.last.next = {element, next: null};
+                this.lookup.set(element, this.last.next);
+                this.last = this.last.next;
+                if(this.min > element) {
+                    this.min = element;
+                }
+                if(this.max < element) {
+                    this.max = element;
+                }
+            }
         }
     }
 
     addAfter(element, reference) {
-        next = reference.next;
+        let next = reference.next;
         reference.next = {element, next};
+        this.lookup.set(element, reference.next);
+        if(next === null) {
+            this.last = reference.next;
+        }
+        return reference.next;
     }
 
     shift(n = 1) {
@@ -34,13 +59,7 @@ class LinkedList {
     }
 
     getLast() {
-        if(this.head === null) {
-            return null;
-        }
-        let current = this.head;
-        while(current.next !== null) {
-            current = current.next();
-        }
+        return this.last;
     }
 
     getFirst() {
@@ -55,6 +74,10 @@ class LinkedList {
             next = next.next;
         }
         return array;
+    }
+
+    getReference(element) {
+        return this.lookup.get(element);
     }
 }
 
@@ -80,37 +103,44 @@ function Max(array) {
 
 
 function move(list) {
-    const line = [...list];
-    const selected = line[0];
-    const pickup = line.splice(1, 3);
-    const min = Min(line);
-    const max = Max(line);
+    const selected = list.shift();
+    const pickup = [list.shift(), list.shift(), list.shift()];
     let insertAfter = selected - 1;
-    while(!line.includes(insertAfter)) {
+    while(insertAfter < list.min || pickup.includes(insertAfter)) {
         insertAfter--;
-        if(insertAfter < min) {
-            insertAfter = max;
+        if(insertAfter < list.min) {
+            insertAfter = list.max;
         }
     }
-    const insertAfterIndex = line.indexOf(insertAfter);
-    const newLine = [...line.slice(1,insertAfterIndex + 1), ...pickup, ...line.slice(insertAfterIndex + 1), selected];
-    return newLine;
-}
-
-function arrayEquals(a, b) {
-	return a.length === b.length && a.every((v, i) => v === b[i]);
+    let insertAfterReference = list.getReference(insertAfter);
+    insertAfterReference = list.addAfter(pickup[0], insertAfterReference);
+    insertAfterReference = list.addAfter(pickup[1], insertAfterReference);
+    insertAfterReference = list.addAfter(pickup[2], insertAfterReference);
+    list.addAfter(selected, list.getLast());
 }
 
 function moves(numbers, times, log = false) {
-    let line = numbers;
+    const logEvery = 100000
+    let list = new LinkedList();
+    list.addArray(numbers);
     const percent = times / 100;
+    if(log) {
+        console.time(logEvery);
+    }
     for(let i = 0; i < times; i++) {
-        line = move(line);
+        move(list);
+        if(log && (((i+1) % logEvery) === 0)) {
+            console.timeEnd(logEvery);
+            console.time(logEvery);
+        }
         if(log && i % percent === 0) {
             console.log(i/times * 100, "%");
         }
     }
-    return fromOne(line);
+    if(log) {
+        console.timeEnd(logEvery);
+    }
+    return fromOne(list.toArray());
 }
 
 function fromOne(line) {
@@ -123,7 +153,7 @@ console.time("time");
 console.log("part1:", moves(values, 100).join(""));
 console.timeEnd("time");
 
-// const values2 = [...values, ...Array.from(Array(1000000-values.length), (v, i) => Math.max(...values) + i + 1)];
-
-// const res = moves(values2, 10000000);
-// console.log(res.slice(0,2));
+console.time("time");
+const values2 = [...values, ...Array.from(Array(1000000-values.length), (v, i) => Math.max(...values) + i + 1)];
+console.log("part2:",moves(values2, 10000000).slice(0,2).reduce((acc, v) => acc * v, 1));
+console.timeEnd("time");
